@@ -28,7 +28,7 @@ class textfile:
         fileRef.close()
 
 class cheaderfile(textfile):
-    """Class to handle text file.
+    """Class to handle C header file.
     
     Date June 2009
     Created by ykk
