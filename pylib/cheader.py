@@ -73,7 +73,8 @@ class carray(ctype):
     def __init__(self, typename, name, isPrimitive, size):
         """Initialize array of object.
         """
-        ctype.__init__(self, typename, name, isPrimitive)
+        ctype.__init__(self, typename, name,
+                       (isinstance(size, int) and isPrimitive))
         ##Object reference
         if (isPrimitive):
             self.object = cprimitive(typename, name)
