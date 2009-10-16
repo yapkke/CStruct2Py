@@ -27,45 +27,58 @@ class textfile:
             self.content.append(line)
         fileRef.close()        
 
-class cprimitive:
+class ctype:
+    """Class to represent types in C
+    """
+    def __init__(self,typename, name=None, expanded=False):
+        """Initialize
+        """
+        ##Name
+        self.name = name
+        ##Type of primitive
+        self.type = typename
+        ##Expanded
+        self.expanded = expanded
+
+class cprimitive(ctype):
     """Class to represent C primitive
 
     Date October 2009
     Created by ykk
     """
-    def __init__(self,name, type):
+    def __init__(self,typename, name=None):
         """Initialize and store primitive
         """
-        ##Name
-        self.name = name
-        ##Type of primitive
-        self.type = type
+        ctype.__init__(self, typename, name, True)
         
-class cstruct:
+class cstruct(ctype):
     """Class to represent C struct
 
     Date October 2009
     Created by ykk
     """
-    def __init__(self, name):
+    def __init__(self, typename, name=None):
         """Initialize struct
         """
-        ##Name of struct
-        self.name = name
+        ctype.__init__(self, typename, name)
         ##List of members in struct
         self.members = []
 
-class carray:
+class carray(ctype):
     """Class to represent C array
 
     Date October 2009
     Created by ykk
     """
-    def __init__(self, object, size):
+    def __init__(self, typename, name, isPrimitive, size):
         """Initialize array of object.
         """
+        ctype.__init__(self, typename, name, isPrimitive)
         ##Object reference
-        self.object = object
+        if (isPrimitive):
+            self.object = cprimitive(typename, name)
+        else:
+            self.object = cstruct(typename, name)
         ##Size of array
         self.size = size
 
@@ -120,7 +133,12 @@ class ctype_parser:
         if (len(values) != 1):
             return (1,string)
         else:
-            return (values[0][1:-1],
+            val = values[0][1:-1]
+            try:
+                sizeval = int(val)
+            except ValueError:
+                sizeval = val
+            return (sizeval,
                     namepattern.findall(string)[0].strip()[0:-1])
 
     def parse_type(self, string):
@@ -129,7 +147,21 @@ class ctype_parser:
         """
         parts=string.strip().split()
         if (len(parts) >= 2):
-            print str(" ".join(parts[:-1]))+"\t"+str(self.parse_array(parts[-1]))
+            typename = " ".join(parts[:-1])
+            (size, name) = self.parse_array(parts[-1])
+            if (size == 0):
+                return None
+            #Create appropriate type
+            if (size > 1):
+                #Array
+                return carray(typename, name, 
+                              self.is_primitive(typename),size)
+            else:
+                #Not array
+                if (self.is_primitive(typename)):
+                    return cprimitive(typename, name)
+                else:
+                    return cstruct(typename, name)
         else:
             return None
 
@@ -186,6 +218,8 @@ class cheaderfile(textfile):
             for val in values:
                 cstru.members.append(typeparser.parse_type(val))
             self.structs[structname] = cstru
+            print "\t"+structname
+            #print match
             print
         
     def __get_enum(self):
