@@ -101,12 +101,15 @@ class cstruct(ctype):
         self.expanded = True
         #Expanded each member
         for member in self.members:
-            if (not member.expanded):
+            if (isinstance(member, cstruct) and 
+                (not member.expanded)):
                 try:
                     cheader.structs[member.typename].expand(cheader)
                     member.members=cheader.structs[member.typename].members[:]
                 except KeyError:
                     self.expanded=False
+            else:
+                member.expand(cheader)
 
 class carray(ctype):
     """Class to represent C array
@@ -135,9 +138,24 @@ class carray(ctype):
     def expand(self, cheader):
         """Expand array
         """
-        if (not self.object.expanded):
-            self.object.expand(cheader)
         self.expanded = True
+        if (not self.object.expanded):
+            if (isinstance(self.object, cstruct)):
+                cheader.structs[self.object.typename].expand(cheader)
+                self.object.members=cheader.structs[self.object.typename].members[:]    
+            else:
+                self.object.expand(cheader)
+
+        if (not isinstance(self.size, int)):
+            val = cheader.get_value(self.size)
+            if (val == None):
+                self.expanded = False
+            else:
+                try:
+                    self.size = int(val)
+                except ValueError:
+                    self.size = val
+                    self.expanded = False
 
 class ctype_parser:
     """Class to check c types
