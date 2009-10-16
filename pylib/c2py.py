@@ -57,6 +57,32 @@ class cstruct2py:
         """
         if (isinstance(ctype, str)):
             return struct.calcsize(ctype)
-        else:
+        elif (isinstance(ctype, cheader.ctype)):
             return struct.calcsize(self.get_pattern(ctype))
+        else:
+            return 0
 
+class structpacker:
+    """Pack/unpack packets with ctype.
+    
+    Date October 2009
+    Created by ykk
+    """
+    def pack(self, ctype, *arg):
+        """Pack packet accordingly ctype or pattern provided.
+        Return struct packed.
+        """
+        if (isinstance(ctype, str)):
+            return struct.pack(ctype, *arg)
+        elif (isinstance(ctype, cheader.ctype)):
+            return struct.pack(cstruct2py.get_pattern(ctype),
+                               *arg)
+        else:
+            return None
+
+    def unpack_from_front(self, ctype, *arg):
+        """Unpack packet using front of packet,
+        accordingly ctype or pattern provided.
+        """
+        pass
+        
