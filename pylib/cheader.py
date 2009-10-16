@@ -46,6 +46,9 @@ class cheaderfile(textfile):
         self.enums = {}
         self.enum_values = {}
         self.__get_enum()
+        ##Dictionary of structs
+        self.structs = {}
+        self.__get_struct()
 
     def __remove_comments(self):
         """Remove all comments
@@ -59,6 +62,22 @@ class cheaderfile(textfile):
         fileStr = pattern.sub("",fileStr)
         self.content = fileStr.split('\n')
 
+    def __get_struct(self):
+        """Get all structs
+        """
+        fileStr = "".join(self.content)
+        #Find all structs
+        pattern = re.compile("struct(\s*?){.*?};", re.MULTILINE)
+        matches = pattern.findall(fileStr)
+        #Process each struct
+        namepattern = re.compile("struct(.+?)[ {]", re.MULTILINE)
+        pattern = re.compile("{(.+?)}", re.MULTILINE)
+        for match in matches:
+            values = pattern.findall(match)[0].strip().split(";")
+            print match
+            #print namepattern.findall(match)[0].strip()
+            print
+        
     def __get_enum(self):
         """Get all enumeration
         """

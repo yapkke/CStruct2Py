@@ -18,14 +18,16 @@ def usage():
           "-e/--enum\n\tPrint specified enumeration\n"+\
           "-M/--macros\n\tPrint all macros\n"+\
           "-m/--macro\n\tPrint value of macro\n"+\
+          "-S/--structs\n\tPrint all structs\n"+\
           "-n/--name-only\n\tPrint names only\n"+\
           "-P/--print-no-comment\n\tPrint with comment removed only\n"+\
           ""
           
 #Parse options and arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hMm:Ee:nP",
+    opts, args = getopt.getopt(sys.argv[1:], "hMm:Ee:SnP",
                                ["help","macros","macro=","enums","enum=",
+                                "structs",
                                 "name-only","print-no-comment"])
 except getopt.GetoptError:
     usage()
@@ -39,6 +41,8 @@ if not (len(args) == 1):
 #Parse options
 ##Print names only
 nameOnly = False
+##Print all structs?
+allStructs = False
 ##Print all enums?
 allEnums = False
 ##Query specific enum
@@ -53,6 +57,8 @@ for opt,arg in opts:
     if (opt in ("-h","--help")):
         usage()
         sys.exit(0)
+    elif (opt in ("-S","--structs")): 
+        allStructs = True
     elif (opt in ("-M","--macros")): 
         allMacros = True
     elif (opt in ("-m","--macro")): 
@@ -89,6 +95,9 @@ if (macro != ""):
         print "Macro "+macro+" not found!"
 
 
+#Print all structs
+#if (allStructs):
+
 #Print all enumerations
 if (allEnums):
     for (enumname, values) in headerfile.enums.items():
@@ -96,7 +105,8 @@ if (allEnums):
         if (not nameOnly):
             for enumval in values:
                 try:
-                    print "\t"+enumval+"="+str(headerfile.enum_values[enumval])
+                    print "\t"+enumval+"="+\
+                          str(headerfile.enum_values[enumval])
                 except KeyError:
                     print enumval+" not found in enum!";
 
