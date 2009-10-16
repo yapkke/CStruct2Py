@@ -248,6 +248,19 @@ class cheaderfile(textfile):
         self.structs = {}
         self.__get_struct()
 
+    def get_value(self, name):
+        """Get value for variable name,
+        searching through enum and macros.
+        Else return None
+        """
+        try:
+            return self.enum_values[name]
+        except KeyError:
+            try:
+                return self.macros[name]
+            except KeyError:
+                return None
+
     def __remove_comments(self):
         """Remove all comments
         """
