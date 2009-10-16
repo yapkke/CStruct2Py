@@ -25,7 +25,7 @@ class textfile:
         fileRef = open(self.filename, "r")
         for line in fileRef:
             self.content.append(line)
-        fileRef.close()
+        fileRef.close()        
 
 class cprimitive:
     """Class to represent C primitive
@@ -67,7 +67,8 @@ class ctype_check:
         self.CPrimitives = ["char","signed char","unsigned char",
                             "short","unsigned short",
                             "int","unsigned int",
-                            "long","unsigned long","long long",
+                            "long","unsigned long",
+                            "long long","unsigned long long",
                             "float","double",
                             "uint8_t","uint16_t","uint32_t","uint64_t"]
 
@@ -81,10 +82,28 @@ class ctype_check:
         else:
             return False
 
-    def parse_type(self, string):
-        """Parse string and return cstruct or cprimitive
+    def is_array(self, string):
+        """Check if string declares an array
         """
-        print string.strip().split()
+        parts=string.strip().split()
+        if (len(parts) <= 1):
+            return False
+        else:
+            pattern = re.compile("\[.*?\]", re.MULTILINE)
+            values = pattern.findall(string)
+            if (len(values) == 1):
+                return True
+            else:
+                return False
+
+    def parse_type(self, string):
+        """Parse string and return cstruct or cprimitive.
+        Else return None
+        """
+        parts=string.strip().split()
+        if (len(parts) == 0):
+            return None
+        print string.strip()+"\t"+str(self.is_array(string))
 
 class cheaderfile(textfile):
     """Class to handle C header file.
