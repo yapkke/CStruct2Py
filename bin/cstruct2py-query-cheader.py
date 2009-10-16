@@ -94,9 +94,13 @@ if (macro != ""):
     except KeyError:
         print "Macro "+macro+" not found!"
 
-
 #Print all structs
-#if (allStructs):
+if (allStructs):
+    for (structname, value) in headerfile.structs.items():
+        if (nameOnly):
+            print structname
+        else:
+            print str(value)+"\n"
 
 #Print all enumerations
 if (allEnums):

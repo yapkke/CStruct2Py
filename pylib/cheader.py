@@ -36,7 +36,7 @@ class ctype:
         ##Name
         self.name = name
         ##Type of primitive
-        self.type = typename
+        self.typename = typename
         ##Expanded
         self.expanded = expanded
 
@@ -50,6 +50,14 @@ class cprimitive(ctype):
         """Initialize and store primitive
         """
         ctype.__init__(self, typename, name, True)
+
+    def __str__(self):
+        """Return string representation
+        """
+        if (self.name == None):
+            return self.typename
+        else:
+            return self.typename+" "+str(self.name)
         
 class cstruct(ctype):
     """Class to represent C struct
@@ -63,6 +71,21 @@ class cstruct(ctype):
         ctype.__init__(self, typename, name)
         ##List of members in struct
         self.members = []
+    
+    def __str__(self):
+        """Return string representation
+        """
+        string = "struct "+self.typename+" "
+        if (self.name != None):
+            string += self.name+" "
+        if (len(self.members) == 0):
+            return string
+        #Add members
+        string +="{\n"
+        for member in self.members:
+            string += "\t"+str(member)+"\n"
+        string +="};"
+        return string
 
 class carray(ctype):
     """Class to represent C array
@@ -217,12 +240,11 @@ class cheaderfile(textfile):
             values = pattern.findall(match)[0].strip().split(";")
             cstru = cstruct(structname)
             for val in values:
-                cstru.members.append(typeparser.parse_type(val))
+                presult = typeparser.parse_type(val)
+                if (presult != None):
+                    cstru.members.append(presult)
             self.structs[structname] = cstru
-            print "\t"+structname
-            #print match
-            print
-        
+
     def __get_enum(self):
         """Get all enumeration
         """
