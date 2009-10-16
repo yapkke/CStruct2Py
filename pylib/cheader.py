@@ -55,6 +55,20 @@ class cstruct:
         ##List of members in struct
         self.members = []
 
+class carray:
+    """Class to represent C array
+
+    Date October 2009
+    Created by ykk
+    """
+    def __init__(self, object, size):
+        """Initialize array of object.
+        """
+        ##Object reference
+        self.object = object
+        ##Size of array
+        self.size = size
+
 class ctype_parser:
     """Class to check c types
 
@@ -96,17 +110,28 @@ class ctype_parser:
             else:
                 return False
 
-    def parse_array(self.string):
-        
+    def parse_array(self, string):
+        """Parse array from string.
+        Return occurrence and name.
+        """
+        pattern = re.compile("\[.*?\]", re.MULTILINE)
+        namepattern = re.compile(".*?\[", re.MULTILINE)
+        values = pattern.findall(string)
+        if (len(values) != 1):
+            return (1,string)
+        else:
+            return (values[0][1:-1],
+                    namepattern.findall(string)[0].strip()[0:-1])
 
     def parse_type(self, string):
         """Parse string and return cstruct or cprimitive.
         Else return None
         """
         parts=string.strip().split()
-        if (len(parts) == 0):
+        if (len(parts) >= 2):
+            print str(" ".join(parts[:-1]))+"\t"+str(self.parse_array(parts[-1]))
+        else:
             return None
-        print str(parts)+"\t"+str(self.is_array(string))
 
 class cheaderfile(textfile):
     """Class to handle C header file.
