@@ -27,6 +27,65 @@ class textfile:
             self.content.append(line)
         fileRef.close()
 
+class cprimitive:
+    """Class to represent C primitive
+
+    Date October 2009
+    Created by ykk
+    """
+    def __init__(self,name, type):
+        """Initialize and store primitive
+        """
+        ##Name
+        self.name = name
+        ##Type of primitive
+        self.type = type
+        
+class cstruct:
+    """Class to represent C struct
+
+    Date October 2009
+    Created by ykk
+    """
+    def __init__(self, name):
+        """Initialize struct
+        """
+        ##Name of struct
+        self.name = name
+        ##List of members in struct
+        self.members = []
+
+class ctype_check:
+    """Class to check c types
+
+    Date October 2009
+    Created by ykk
+    """
+    def __init__(self):
+        """Initialize
+        """
+        self.CPrimitives = ["char","signed char","unsigned char",
+                            "short","unsigned short",
+                            "int","unsigned int",
+                            "long","unsigned long","long long",
+                            "float","double",
+                            "uint8_t","uint16_t","uint32_t","uint64_t"]
+
+    def is_primitive(self,type):
+        """Check type given is primitive.
+
+        Return true if valid, and false otherwise
+        """
+        if (type in self.CPrimitives):
+            return True
+        else:
+            return False
+
+    def parse_type(self, string):
+        """Parse string and return cstruct or cprimitive
+        """
+        print string.strip().split()
+
 class cheaderfile(textfile):
     """Class to handle C header file.
     
@@ -65,17 +124,21 @@ class cheaderfile(textfile):
     def __get_struct(self):
         """Get all structs
         """
+        typecheck = ctype_check()
         fileStr = "".join(self.content)
         #Find all structs
-        pattern = re.compile("struct(\s*?){.*?};", re.MULTILINE)
+        pattern = re.compile("struct[\w\s]*?{.*?};", re.MULTILINE)
         matches = pattern.findall(fileStr)
         #Process each struct
         namepattern = re.compile("struct(.+?)[ {]", re.MULTILINE)
-        pattern = re.compile("{(.+?)}", re.MULTILINE)
+        pattern = re.compile("{(.+?)};", re.MULTILINE)
         for match in matches:
+            structname = namepattern.findall(match)[0].strip()
             values = pattern.findall(match)[0].strip().split(";")
-            print match
-            #print namepattern.findall(match)[0].strip()
+            cstru = cstruct(structname)
+            for val in values:
+                cstru.members.append(typecheck.parse_type(val))
+            self.structs[structname] = cstru
             print
         
     def __get_enum(self):
@@ -83,7 +146,7 @@ class cheaderfile(textfile):
         """
         fileStr = "".join(self.content)
         #Find all enumerations
-        pattern = re.compile("enum.*?{.*?}", re.MULTILINE)
+        pattern = re.compile("enum[\w\s]*?{.*?}", re.MULTILINE)
         matches = pattern.findall(fileStr)
         #Process each enumeration
         namepattern = re.compile("enum(.+?){", re.MULTILINE)
