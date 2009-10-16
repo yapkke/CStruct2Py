@@ -4,6 +4,7 @@ Date June 2009
 Created by ykk
 """
 import cheader
+import struct
 
 class cstruct2py:
     """Class converts C struct to Python struct pattern string
@@ -51,3 +52,11 @@ class cstruct2py:
                 return string * ctype.size
         return None
         
+    def get_size(self, ctype):
+        """Return size of struct or pattern specified
+        """
+        if (isinstance(ctype, str)):
+            return struct.calcsize(ctype)
+        else:
+            return struct.calcsize(self.get_pattern(ctype))
+

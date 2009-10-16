@@ -17,12 +17,13 @@ def usage():
           "Options:\n"+\
           "-h/--help\n\tPrint this usage guide\n"+\
           "-c/--cstruct\n\tPrint C struct\n"+\
+          "-s/--size\n\tPrint size of struct\n"+\
           ""
           
 #Parse options and arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hc",
-                               ["help","cstruct"])
+    opts, args = getopt.getopt(sys.argv[1:], "hcs",
+                               ["help","cstruct","size"])
 except getopt.GetoptError:
     usage()
     sys.exit(2)
@@ -35,10 +36,14 @@ if not (len(args) == 2):
 #Parse options
 ##Print C struct
 printc = False
+##Print size
+printsize = False
 for opt,arg in opts:
     if (opt in ("-h","--help")):
         usage()
         sys.exit(0)
+    elif (opt in ("-s","--size")): 
+        printsize = True
     elif (opt in ("-c","--cstruct")): 
         printc = True
     else:
@@ -47,8 +52,15 @@ for opt,arg in opts:
 headerfile = cheader.cheaderfile(args[0])
 cstruct = headerfile.structs[args[1].strip()]
 cs2p = c2py.cstruct2py()
+pattern = cs2p.get_pattern(cstruct)
 
+#Print C struct
 if (printc):
     print cstruct
 
-print "Python pattern = "+cs2p.get_pattern(cstruct)
+#Print pattern
+print "Python pattern = "+pattern
+
+#Print size
+if (printsize):
+    print "Size = "+str(cs2p.get_size(pattern))
