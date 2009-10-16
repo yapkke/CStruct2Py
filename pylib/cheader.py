@@ -75,15 +75,15 @@ class cstruct(ctype):
     def __str__(self):
         """Return string representation
         """
-        string = "struct "+self.typename+" "
+        string = "struct "+self.typename
         if (self.name != None):
-            string += self.name+" "
+            string += " "+self.name
         if (len(self.members) == 0):
             return string
         #Add members
-        string +="{\n"
+        string +=" {\n"
         for member in self.members:
-            string += "\t"+str(member)+"\n"
+            string += "\t"+str(member)+";\n"
         string +="};"
         return string
 
@@ -105,6 +105,11 @@ class carray(ctype):
             self.object = cstruct(typename, name)
         ##Size of array
         self.size = size
+
+    def __str__(self):
+        """Return string representation
+        """
+        return str(self.object)+"["+str(self.size)+"]"
 
 class ctype_parser:
     """Class to check c types

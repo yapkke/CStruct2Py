@@ -19,15 +19,16 @@ def usage():
           "-M/--macros\n\tPrint all macros\n"+\
           "-m/--macro\n\tPrint value of macro\n"+\
           "-S/--structs\n\tPrint all structs\n"+\
+          "-s/--struct\n\tPrint struct\n"+\
           "-n/--name-only\n\tPrint names only\n"+\
           "-P/--print-no-comment\n\tPrint with comment removed only\n"+\
           ""
           
 #Parse options and arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hMm:Ee:SnP",
+    opts, args = getopt.getopt(sys.argv[1:], "hMm:Ee:Ss:nP",
                                ["help","macros","macro=","enums","enum=",
-                                "structs",
+                                "structs","struct="
                                 "name-only","print-no-comment"])
 except getopt.GetoptError:
     usage()
@@ -43,6 +44,8 @@ if not (len(args) == 1):
 nameOnly = False
 ##Print all structs?
 allStructs = False
+##Query specific struct
+struct=""
 ##Print all enums?
 allEnums = False
 ##Query specific enum
@@ -59,6 +62,8 @@ for opt,arg in opts:
         sys.exit(0)
     elif (opt in ("-S","--structs")): 
         allStructs = True
+    elif (opt in ("-s","--struct")): 
+        struct = arg
     elif (opt in ("-M","--macros")): 
         allMacros = True
     elif (opt in ("-m","--macro")): 
@@ -101,6 +106,13 @@ if (allStructs):
             print structname
         else:
             print str(value)+"\n"
+
+#Print specified struct
+if (struct != ""):
+    try:
+        print str(headerfile.structs[struct])
+    except KeyError:
+        print "Struct "+struct+" not found!"
 
 #Print all enumerations
 if (allEnums):
