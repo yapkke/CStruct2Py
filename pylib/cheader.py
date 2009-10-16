@@ -171,7 +171,10 @@ class ctype_parser:
         """
         parts=string.strip().split()
         if (len(parts) >= 2):
-            typename = " ".join(parts[:-1])
+            if (parts[0].strip() == "struct"):
+                typename = " ".join(parts[1:-1])
+            else:
+                typename = " ".join(parts[:-1])
             (size, name) = self.parse_array(parts[-1])
             if (size == 0):
                 return None
