@@ -40,6 +40,11 @@ class ctype:
         ##Expanded
         self.expanded = expanded
 
+    def expand(self, cheader):
+        """Expand type if applicable
+        """
+        pass
+
 class cprimitive(ctype):
     """Class to represent C primitive
 
@@ -83,9 +88,25 @@ class cstruct(ctype):
         #Add members
         string +=" {\n"
         for member in self.members:
-            string += "\t"+str(member)+";\n"
+            string += "\t"+str(member)
+            if (not isinstance(member, cstruct)):
+                string += ";"
+            string += "\n"
         string +="};"
         return string
+
+    def expand(self, cheader):
+        """Expand struct
+        """
+        self.expanded = True
+        #Expanded each member
+        for member in self.members:
+            if (not member.expanded):
+                try:
+                    cheader.structs[member.typename].expand(cheader)
+                    member.members=cheader.structs[member.typename].members[:]
+                except KeyError:
+                    self.expanded=False
 
 class carray(ctype):
     """Class to represent C array
@@ -110,6 +131,13 @@ class carray(ctype):
         """Return string representation
         """
         return str(self.object)+"["+str(self.size)+"]"
+
+    def expand(self, cheader):
+        """Expand array
+        """
+        if (not self.object.expanded):
+            self.object.expand(cheader)
+        self.expanded = True
 
 class ctype_parser:
     """Class to check c types
@@ -252,6 +280,9 @@ class cheaderfile(textfile):
                 if (presult != None):
                     cstru.members.append(presult)
             self.structs[structname] = cstru
+        #Expand all structs
+        for (structname, struct) in self.structs.items():
+            struct.expand(self)
 
     def __get_enum(self):
         """Get all enumeration
