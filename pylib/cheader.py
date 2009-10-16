@@ -104,8 +104,10 @@ class cstruct(ctype):
             if (isinstance(member, cstruct) and 
                 (not member.expanded)):
                 try:
-                    cheader.structs[member.typename].expand(cheader)
+                    if (not cheader.structs[member.typename].expanded):
+                        cheader.structs[member.typename].expand(cheader)
                     member.members=cheader.structs[member.typename].members[:]
+                    member.expanded = True
                 except KeyError:
                     self.expanded=False
             else:
