@@ -55,7 +55,7 @@ class cstruct:
         ##List of members in struct
         self.members = []
 
-class ctype_check:
+class ctype_parser:
     """Class to check c types
 
     Date October 2009
@@ -96,6 +96,9 @@ class ctype_check:
             else:
                 return False
 
+    def parse_array(self.string):
+        
+
     def parse_type(self, string):
         """Parse string and return cstruct or cprimitive.
         Else return None
@@ -103,7 +106,7 @@ class ctype_check:
         parts=string.strip().split()
         if (len(parts) == 0):
             return None
-        print string.strip()+"\t"+str(self.is_array(string))
+        print str(parts)+"\t"+str(self.is_array(string))
 
 class cheaderfile(textfile):
     """Class to handle C header file.
@@ -143,7 +146,7 @@ class cheaderfile(textfile):
     def __get_struct(self):
         """Get all structs
         """
-        typecheck = ctype_check()
+        typeparser = ctype_parser()
         fileStr = "".join(self.content)
         #Find all structs
         pattern = re.compile("struct[\w\s]*?{.*?};", re.MULTILINE)
@@ -156,7 +159,7 @@ class cheaderfile(textfile):
             values = pattern.findall(match)[0].strip().split(";")
             cstru = cstruct(structname)
             for val in values:
-                cstru.members.append(typecheck.parse_type(val))
+                cstru.members.append(typeparser.parse_type(val))
             self.structs[structname] = cstru
             print
         
