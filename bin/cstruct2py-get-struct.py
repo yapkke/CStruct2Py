@@ -17,13 +17,14 @@ def usage():
           "Options:\n"+\
           "-h/--help\n\tPrint this usage guide\n"+\
           "-c/--cstruct\n\tPrint C struct\n"+\
+          "-n/--name\n\tPrint names of struct\n"+\
           "-s/--size\n\tPrint size of struct\n"+\
           ""
           
 #Parse options and arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hcs",
-                               ["help","cstruct","size"])
+    opts, args = getopt.getopt(sys.argv[1:], "hcsn",
+                               ["help","cstruct","size","names"])
 except getopt.GetoptError:
     usage()
     sys.exit(2)
@@ -36,6 +37,8 @@ if not (len(args) == 2):
 #Parse options
 ##Print C struct
 printc = False
+##Print names
+printname = False
 ##Print size
 printsize = False
 for opt,arg in opts:
@@ -46,6 +49,8 @@ for opt,arg in opts:
         printsize = True
     elif (opt in ("-c","--cstruct")): 
         printc = True
+    elif (opt in ("-n","--names")): 
+        printname = True
     else:
         assert (False,"Unhandled option :"+opt)
 
@@ -60,6 +65,10 @@ if (printc):
 
 #Print pattern
 print "Python pattern = "+pattern
+
+#Print name
+if (printname):
+    print cstruct.get_names()
 
 #Print size
 if (printsize):

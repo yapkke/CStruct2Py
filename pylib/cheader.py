@@ -45,6 +45,11 @@ class ctype:
         """
         pass
 
+    def get_names(self):
+        """Return name of variables
+        """
+        pass
+
 class cprimitive(ctype):
     """Class to represent C primitive
 
@@ -64,6 +69,13 @@ class cprimitive(ctype):
         else:
             return self.typename+" "+str(self.name)
         
+    def get_names(self):
+        """Return name of variables
+        """
+        namelist = []
+        namelist.append(self.name)
+        return namelist
+
 class cstruct(ctype):
     """Class to represent C struct
 
@@ -113,6 +125,20 @@ class cstruct(ctype):
             else:
                 member.expand(cheader)
 
+    def get_names(self):
+        """Return name of variables
+        """
+        namelist = []
+        for member in self.members:
+            if (isinstance(member, cstruct)):
+                tmplist = member.get_names()
+                for item in tmplist:
+                    namelist.append(member.name+"."+item)
+            else:
+                namelist.extend(member.get_names())
+        return namelist
+
+
 class carray(ctype):
     """Class to represent C array
 
@@ -158,6 +184,14 @@ class carray(ctype):
                 except ValueError:
                     self.size = val
                     self.expanded = False
+
+    def get_names(self):
+        """Return name of variables
+        """
+        namelist = []
+        for i in range(0,self.size):
+            namelist.append(self.object.name)
+        return namelist
 
 class ctype_parser:
     """Class to check c types
