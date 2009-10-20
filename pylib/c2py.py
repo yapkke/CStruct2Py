@@ -105,6 +105,12 @@ class structpacker:
 
         #Format and return dictionary
         valDic = {}
+        names = ctype.get_names()
+        for n in names:
+            valDic[names] = []
+        for d in data:
+            name = names.pop(0)
+            valDic[name].append(d)
         return (valDic, remaining)
 
     def __unpack_from_front_simple(self, patternString, binaryString):
