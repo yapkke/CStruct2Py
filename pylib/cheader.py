@@ -306,13 +306,14 @@ class cheaderfile(textfile):
         pattern = re.compile("{(.+?)};", re.MULTILINE)
         for match in matches:
             structname = namepattern.findall(match)[0].strip()
-            values = pattern.findall(match)[0].strip().split(";")
-            cstru = cstruct(structname)
-            for val in values:
-                presult = typeparser.parse_type(val)
-                if (presult != None):
-                    cstru.members.append(presult)
-            self.structs[structname] = cstru
+            if (len(structname) != 0):
+                values = pattern.findall(match)[0].strip().split(";")
+                cstru = cstruct(structname)
+                for val in values:
+                    presult = typeparser.parse_type(val)
+                    if (presult != None):
+                        cstru.members.append(presult)
+                self.structs[structname] = cstru
         #Expand all structs
         for (structname, struct) in self.structs.items():
             struct.expand(self)
