@@ -80,9 +80,32 @@ class structpacker:
         else:
             return None
 
-    def unpack_from_front(self, ctype, *arg):
+    def unpack_from_front(self, ctype, binaryString, returnDictionary=False):
         """Unpack packet using front of packet,
         accordingly ctype or pattern provided.
         """
-        pass
+        pattern = ""
+        if (isinstance(ctype, str)):
+            pattern = ctype
+        elif (isinstance(ctype, cheader.ctype)):
+            pattern = cstruct2py.get_pattern(ctype)
+        else:
+            return None
+        (data, remaining) = unpack_from_front_simple(pattern, binaryString)
         
+        #Return simple array of values
+        if (isinstance(ctype, str) or
+            (not returnDictionary)):
+            return (data, remaining)
+
+        #Format and return dictionary
+        
+
+    def unpack_from_front_simple(self, patternString, binaryString):
+        """Unpack packet using pattern string.
+        Return (unpacked array,remaining string)
+        """
+        dsize = struct.calcsize(patternString)
+        return (struct.unpack(patternString, 
+                              binaryString[0:dsize]),
+                binaryString[dsize:])
