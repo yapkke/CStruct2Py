@@ -96,12 +96,32 @@ class structpacker:
             pattern = cstruct2py.get_pattern(ctype)
         else:
             return None
-        (data, remaining) = self.__unpack_from_front_simple(pattern, binaryString)
+        dsize = struct.calcsize(patternString)
+        return (self.peek_from_front_simple(pattern, binaryString, returnDictionary),
+                binaryString[dsize:])
+
+    def peek_from_front(self, ctype, binaryString, returnDictionary=True):
+        """Unpack packet using front of packet,
+        accordingly ctype or pattern provided.
+
+        Return dictionary of values indexed by arg name,
+        if ctype is cheader.ctype and returnDictionary is True, 
+        else return array of data unpacked.
+        """
+        pattern = ""
+        if (isinstance(ctype, str)):
+            pattern = ctype
+        elif (isinstance(ctype, cheader.ctype)):
+            pattern = cstruct2py.get_pattern(ctype)
+        else:
+            return None
+        dsize = struct.calcsize(patternString)
+        data = struct.unpack(pattern, binaryString[0:dsize])
         
         #Return simple array of values
         if (isinstance(ctype, str) or
             (not returnDictionary)):
-            return (data, remaining)
+            return data
 
         #Format and return dictionary
         valDic = {}
@@ -111,13 +131,4 @@ class structpacker:
         for d in data:
             name = names.pop(0)
             valDic[name].append(d)
-        return (valDic, remaining)
-
-    def __unpack_from_front_simple(self, patternString, binaryString):
-        """Unpack packet using pattern string.
-        Return (unpacked array,remaining string)
-        """
-        dsize = struct.calcsize(patternString)
-        return (struct.unpack(patternString, 
-                              binaryString[0:dsize]),
-                binaryString[dsize:])
+        return valDic
