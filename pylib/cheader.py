@@ -43,12 +43,12 @@ class ctype:
     def expand(self, cheader):
         """Expand type if applicable
         """
-        pass
+        raise NotImplementedError()
 
     def get_names(self):
         """Return name of variables
         """
-        pass
+        raise NotImplementedError()
 
 class cprimitive(ctype):
     """Class to represent C primitive
