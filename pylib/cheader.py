@@ -68,7 +68,12 @@ class cprimitive(ctype):
             return self.typename
         else:
             return self.typename+" "+str(self.name)
-        
+
+    def expand(self, cheader):
+        """Expand type if applicable
+        """
+        pass
+    
     def get_names(self):
         """Return name of variables
         """
