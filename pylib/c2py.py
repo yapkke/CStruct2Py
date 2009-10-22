@@ -96,7 +96,7 @@ class structpacker:
             pattern = cstruct2py.get_pattern(ctype)
         else:
             return None
-        dsize = struct.calcsize(patternString)
+        dsize = struct.calcsize(pattern)
         return (self.peek_from_front_simple(pattern, binaryString, returnDictionary),
                 binaryString[dsize:])
 
@@ -115,7 +115,7 @@ class structpacker:
             pattern = cstruct2py.get_pattern(ctype)
         else:
             return None
-        dsize = struct.calcsize(patternString)
+        dsize = struct.calcsize(pattern)
         data = struct.unpack(pattern, binaryString[0:dsize])
         
         #Return simple array of values
