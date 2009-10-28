@@ -107,7 +107,7 @@ class structpacker:
         if (dsize > len(binaryString)):
             return None
 
-        return (self.peek_from_front_simple(pattern, binaryString, returnDictionary),
+        return (self.peek_from_front(pattern, binaryString, returnDictionary),
                 binaryString[dsize:])
 
     def peek_from_front(self, ctype, binaryString, returnDictionary=True):
