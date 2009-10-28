@@ -394,7 +394,7 @@ class cheaderfile(textfile):
                 valList=val.strip().split("=")
                 enumList.append(valList[0].strip())
                 if (len(valList) == 1):
-                    self.enum_values[valList[0].strip()] = str(value)
+                    self.enum_values[valList[0].strip()] = value
                     value += 1
                 else:
                     self.enum_values[valList[0].strip()] = self.eval_value(valList[1].strip())
