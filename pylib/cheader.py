@@ -311,7 +311,7 @@ class cheaderfile(textfile):
         """Return name of variable in enum
         """
         for e in self.enums[enum]:
-            if (self.enum_values[e] == self.eval_value(value)):
+            if (self.enum_values[e] == value):
                 return e
 
     def eval_value(self, value):
@@ -331,10 +331,10 @@ class cheaderfile(textfile):
         Else return None
         """
         try:
-            return self.eval_value(self.enum_values[name])
+            return self.enum_values[name]
         except KeyError:
             try:
-                return self.eval_value(self.macros[name])
+                return self.macros[name]
             except KeyError:
                 return None
 
@@ -397,7 +397,7 @@ class cheaderfile(textfile):
                     self.enum_values[valList[0].strip()] = str(value)
                     value += 1
                 else:
-                    self.enum_values[valList[0].strip()] = valList[1].strip()
+                    self.enum_values[valList[0].strip()] = self.eval_value(valList[1].strip())
             self.enums[namepattern.findall(match)[0].strip()] = enumList
         
     def __get_macros(self):
@@ -407,6 +407,6 @@ class cheaderfile(textfile):
             if (line[0:8] == "#define "):
                 lineList = line[8:].split()
                 if (len(lineList) >= 2):
-                    self.macros[lineList[0]] = "".join(lineList[1:])
+                    self.macros[lineList[0]] = self.eval_value("".join(lineList[1:]))
                 else:
                     self.macros[lineList[0]] = ""
