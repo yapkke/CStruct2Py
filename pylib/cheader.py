@@ -311,8 +311,19 @@ class cheaderfile(textfile):
         """Return name of variable in enum
         """
         for e in self.enums[enum]:
-            if (self.enum_values[e] == value):
+            if (self.enum_values[e] == self.eval_value(value)):
                 return e
+
+    def eval_value(self, value):
+        """Evaluate value string
+        """
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return int(value,16)
+            except ValueError:
+                return value.strip()
 
     def get_value(self, name):
         """Get value for variable name,
@@ -320,10 +331,10 @@ class cheaderfile(textfile):
         Else return None
         """
         try:
-            return self.enum_values[name]
+            return self.eval_value(self.enum_values[name])
         except KeyError:
             try:
-                return self.macros[name]
+                return self.eval_value(self.macros[name])
             except KeyError:
                 return None
 
