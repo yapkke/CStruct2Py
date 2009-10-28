@@ -68,14 +68,20 @@ class structpacker:
     Date October 2009
     Created by ykk
     """
+    def __init__(self, prefix=""):
+        """Initialize with prefix to struct
+        """
+        ##Reference to prefix
+        self.prefix = prefix
+        
     def pack(self, ctype, *arg):
         """Pack packet accordingly ctype or pattern provided.
         Return struct packed.
         """
         if (isinstance(ctype, str)):
-            return struct.pack(ctype, *arg)
+            return struct.pack(self.prefix+ctype, *arg)
         elif (isinstance(ctype, cheader.ctype)):
-            return struct.pack(cstruct2py.get_pattern(ctype),
+            return struct.pack(self.prefix+cstruct2py.get_pattern(ctype),
                                *arg)
         else:
             return None
@@ -89,14 +95,18 @@ class structpacker:
         and returnDictionary is True, 
         else return (array of data unpacked, remaining binary string).
         """
-        pattern = ""
+        pattern = self.prefix
         if (isinstance(ctype, str)):
-            pattern = ctype
+            pattern += ctype
         elif (isinstance(ctype, cheader.ctype)):
-            pattern = cstruct2py.get_pattern(ctype)
+            pattern += cstruct2py.get_pattern(ctype)
         else:
             return None
         dsize = struct.calcsize(pattern)
+
+        if (dsize > len(binaryString)):
+            return None
+
         return (self.peek_from_front_simple(pattern, binaryString, returnDictionary),
                 binaryString[dsize:])
 
@@ -108,26 +118,32 @@ class structpacker:
         if ctype is cheader.ctype and returnDictionary is True, 
         else return array of data unpacked.
         """
-        pattern = ""
+        pattern = self.prefix
         if (isinstance(ctype, str)):
-            pattern = ctype
+            pattern += ctype
         elif (isinstance(ctype, cheader.ctype)):
-            pattern = cstruct2py.get_pattern(ctype)
+            pattern += cstruct2py.get_pattern(ctype)
         else:
             return None
         dsize = struct.calcsize(pattern)
+        if (dsize > len(binaryString)):
+            return None
         data = struct.unpack(pattern, binaryString[0:dsize])
         
         #Return simple array of values
         if (isinstance(ctype, str) or
             (not returnDictionary)):
             return data
+        else:
+            return self.data2dic(data, ctype)
 
-        #Format and return dictionary
+    def data2dic(self,data,ctype):
+        """Convert data to dictionary
+        """
         valDic = {}
         names = ctype.get_names()
-        for n in names:
-            valDic[names] = []
+        for name in names:
+            valDic[name] = []
         for d in data:
             name = names.pop(0)
             valDic[name].append(d)
