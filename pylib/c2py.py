@@ -95,11 +95,11 @@ class structpacker:
         and returnDictionary is True, 
         else return (array of data unpacked, remaining binary string).
         """
-        pattern = self.prefix
+        pattern = ""
         if (isinstance(ctype, str)):
-            pattern += ctype
+            pattern = ctype
         elif (isinstance(ctype, cheader.ctype)):
-            pattern += cstruct2py.get_pattern(ctype)
+            pattern = cstruct2py.get_pattern(ctype)
         else:
             return None
         dsize = struct.calcsize(pattern)
