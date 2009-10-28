@@ -137,7 +137,7 @@ class structpacker:
         else:
             return self.data2dic(data, ctype)
 
-    def data2dic(self,data,ctype):
+    def data2dic(self,ctype,data):
         """Convert data to dictionary
         """
         valDic = {}
