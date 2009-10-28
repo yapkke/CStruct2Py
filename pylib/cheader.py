@@ -307,6 +307,13 @@ class cheaderfile(textfile):
         self.structs = {}
         self.__get_struct()
 
+    def get_enum_name(self, enum, value):
+        """Return name of variable in enum
+        """
+        for e in self.enums[enum]:
+            if (self.enum_values[e] == value):
+                return e
+
     def get_value(self, name):
         """Get value for variable name,
         searching through enum and macros.
