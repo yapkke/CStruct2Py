@@ -318,12 +318,9 @@ class cheaderfile(textfile):
         """Evaluate value string
         """
         try:
-            return int(value)
-        except ValueError:
-            try:
-                return int(value,16)
-            except ValueError:
-                return value.strip()
+            return eval(value)
+        except SyntaxError:
+            return value.strip()
 
     def get_value(self, name):
         """Get value for variable name,
