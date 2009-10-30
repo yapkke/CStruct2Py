@@ -319,7 +319,7 @@ class cheaderfile(textfile):
         """
         try:
             return eval(value)
-        except SyntaxError:
+        except:
             return value.strip()
 
     def get_value(self, name):
