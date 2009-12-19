@@ -162,7 +162,7 @@ class carray(ctype):
             self.object = cstruct(typename, name)
         ##Size of array
         self.size = size
-
+        
     def __str__(self):
         """Return string representation
         """
@@ -253,7 +253,10 @@ class ctype_parser:
             try:
                 sizeval = int(val)
             except ValueError:
-                sizeval = val
+                if (val==""):
+                    sizeval = 0
+                else:
+                    sizeval = val
             return (sizeval,
                     namepattern.findall(string)[0].strip()[0:-1])
 
