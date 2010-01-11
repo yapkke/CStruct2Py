@@ -15,17 +15,22 @@ class textfile:
         """Initialize filename with no content.
         """
         ##Filename
-        self.filename = filename
+        if (isinstance(filename, str)):
+            self.filename = []
+            self.filename.append(filename)
+        else:
+            self.filename = filename
         ##Content
         self.content = []
 
     def read(self):
         """Read file
         """
-        fileRef = open(self.filename, "r")
-        for line in fileRef:
-            self.content.append(line)
-        fileRef.close()        
+        for filename in self.filename:
+            fileRef = open(filename, "r")
+            for line in fileRef:
+                self.content.append(line)
+            fileRef.close()        
 
 class ctype:
     """Class to represent types in C
@@ -306,6 +311,7 @@ class cheaderfile(textfile):
         self.enums = {}
         self.enum_values = {}
         self.__get_enum()
+        self.__get_enum_values()
         ##Dictionary of structs
         self.structs = {}
         self.__get_struct()
@@ -355,6 +361,11 @@ class cheaderfile(textfile):
         """
         typeparser = ctype_parser()
         fileStr = "".join(self.content)
+        #Remove attribute
+        attrpattern = re.compile("} __attribute__ \(\((.+?)\)\);", re.MULTILINE)
+        attrmatches = attrpattern.findall(fileStr)
+        for amatch in attrmatches:
+            fileStr=fileStr.replace(" __attribute__ (("+amatch+"));",";")
         #Find all structs
         pattern = re.compile("struct[\w\s]*?{.*?};", re.MULTILINE)
         matches = pattern.findall(fileStr)
@@ -391,14 +402,22 @@ class cheaderfile(textfile):
             enumList = []
             value = 0
             for val in values:
-                valList=val.strip().split("=")
-                enumList.append(valList[0].strip())
-                if (len(valList) == 1):
-                    self.enum_values[valList[0].strip()] = value
-                    value += 1
-                else:
-                    self.enum_values[valList[0].strip()] = self.eval_value(valList[1].strip())
-            self.enums[namepattern.findall(match)[0].strip()] = enumList
+                if not (val.strip() == ""):
+                    valList=val.strip().split("=")
+                    enumList.append(valList[0].strip())
+                    if (len(valList) == 1):
+                        self.enum_values[valList[0].strip()] = value
+                        value += 1
+                    else:
+                        self.enum_values[valList[0].strip()] = self.eval_value(valList[1].strip())
+                    self.enums[namepattern.findall(match)[0].strip()] = enumList
+
+    def __get_enum_values(self):
+        """Patch unresolved enum values
+        """
+        for name,enumval in self.enum_values.items():
+            if isinstance(enumval,str):
+                self.enum_values[name] = self.get_value(enumval)
         
     def __get_macros(self):
         """Extract macros

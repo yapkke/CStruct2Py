@@ -52,7 +52,8 @@ for opt,arg in opts:
     elif (opt in ("-n","--names")): 
         printname = True
     else:
-        assert (False,"Unhandled option :"+opt)
+        print "Unhandled option :"+opt
+        sys.exit(1)
 
 headerfile = cheader.cheaderfile(args[0])
 cstruct = headerfile.structs[args[1].strip()]
