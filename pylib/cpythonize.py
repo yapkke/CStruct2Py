@@ -82,12 +82,17 @@ class pythonizer:
         ##Code for assertion
         self.__assertcode = []
 
-    def pycode(self):
+    def pycode(self,preamble=None):
         """Return pythonized code
         """
         code = []
         code.append("import struct")
         code.append("")
+        if (preamble != None):
+            fileRef = open(preamble,"r")
+            for l in fileRef:
+                code.append(l[:-1])
+            fileRef.close()
         for name,struct in self.cheader.structs.items():
             code.extend(self.pycode_struct(struct))
             code.append("")
