@@ -48,8 +48,11 @@ class cstruct2py:
                     string += self.get_pattern(member)
                 return string
             elif (isinstance(ctype, cheader.carray)):
-                string = self.get_pattern(ctype.object)
-                return string * ctype.size
+                if (ctype.size == 0):
+                    return ""
+                else:
+                    string = self.get_pattern(ctype.object)
+                    return string * ctype.size
         return None
         
     def get_size(self, ctype):

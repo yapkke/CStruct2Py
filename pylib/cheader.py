@@ -276,10 +276,8 @@ class ctype_parser:
             else:
                 typename = " ".join(parts[:-1])
             (size, name) = self.parse_array(parts[-1])
-            if (size == 0):
-                return None
             #Create appropriate type
-            if (size > 1):
+            if (size != 1):
                 #Array
                 return carray(typename, name, 
                               self.is_primitive(typename),size)
