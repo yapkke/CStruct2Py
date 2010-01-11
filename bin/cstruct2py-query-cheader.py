@@ -11,7 +11,7 @@ import cheader
 def usage():
     """Display usage
     """
-    print "Usage "+sys.argv[0]+" <options> header_file\n"+\
+    print "Usage "+sys.argv[0]+" <options> header_file_1 header_file_2 ...\n"+\
           "Options:\n"+\
           "-h/--help\n\tPrint this usage guide\n"+\
           "-E/--enums\n\tPrint all enumerations\n"+\
@@ -34,8 +34,8 @@ except getopt.GetoptError:
     usage()
     sys.exit(2)
 
-#Check there is only 1 input file
-if not (len(args) == 1):
+#Check there is at least input file
+if (len(args) < 1):
     usage()
     sys.exit(2)
 
@@ -79,7 +79,7 @@ for opt,arg in opts:
     else:
         assert (False,"Unhandled option :"+opt)
 
-headerfile = cheader.cheaderfile(args[0])
+headerfile = cheader.cheaderfile(args)
 if (printNoComment):
     for line in headerfile.content:
         print line

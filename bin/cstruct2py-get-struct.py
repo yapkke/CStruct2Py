@@ -13,7 +13,7 @@ import c2py
 def usage():
     """Display usage
     """
-    print "Usage "+sys.argv[0]+" <options> header_file struct_name\n"+\
+    print "Usage "+sys.argv[0]+" <options> header_files... struct_name\n"+\
           "Options:\n"+\
           "-h/--help\n\tPrint this usage guide\n"+\
           "-c/--cstruct\n\tPrint C struct\n"+\
@@ -29,8 +29,8 @@ except getopt.GetoptError:
     usage()
     sys.exit(2)
 
-#Check there is only 1 input file and struct name
-if not (len(args) == 2):
+#Check there is at least 1 input file and struct name
+if (len(args) < 2):
     usage()
     sys.exit(2)
     
@@ -55,8 +55,8 @@ for opt,arg in opts:
         print "Unhandled option :"+opt
         sys.exit(1)
 
-headerfile = cheader.cheaderfile(args[0])
-cstruct = headerfile.structs[args[1].strip()]
+headerfile = cheader.cheaderfile(args[:-1])
+cstruct = headerfile.structs[args[-1].strip()]
 cs2p = c2py.cstruct2py()
 pattern = cs2p.get_pattern(cstruct)
 
