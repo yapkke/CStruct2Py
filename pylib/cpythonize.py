@@ -144,6 +144,8 @@ class pythonizer:
         code.extend(self.codepack(struct_in))
         code.append("")
         code.extend(self.codeunpack(struct_in))
+        code.append("")
+        code.extend(self.codelen(struct_in))
         return code
 
     def codeheader(self, struct_in):
@@ -186,8 +188,8 @@ class pythonizer:
                         initvalue="0"
                     else:
                         initvalue="None"
-                    initvalue="["+(initvalue+",")*member.size
-                    initvalue=initvalue[:-1]+"]"
+                    initvalue=(initvalue+",")*member.size
+                    initvalue="["+initvalue[:-1]+"]"
                     self.__arrayassert(member, (prepend+"."+member.name).strip())
                 code.append(prepend+"."+member.name+"= "+initvalue)
             else:
@@ -218,6 +220,8 @@ class pythonizer:
     def __arrayassert(self, carray, carrayname):
         """Return code to check for C array
         """
+        if (carray.size == 0):
+            return
         self.__assertcode.append("\t\tif(not isinstance("+carrayname+", list)):")
         self.__assertcode.append("\t\t\treturn (False, \""+carrayname+" is not list as expected.\")")
         self.__assertcode.append("\t\tif(len("+carrayname+") != "+str(carray.size)+"):")
@@ -294,6 +298,20 @@ class pythonizer:
                         prefix+primPattern+"\", "+\
                         str(primMemberNames).replace("'","")[1:-1]+")")
         return ("",[])
+
+    def codelen(self, struct_in):
+        """Return code to return length
+        """
+        pattern = self.__c2py.get_pattern(struct_in)
+        code = []
+        code.append("\tdef length(self):")
+        code.append("\t\tl = "+str(self.__c2py.get_size(pattern)))
+        for member in struct_in.members:
+            if (isinstance(member, cheader.carray) and member.size == 0):
+                code.append("\t\tfor i in "+member.name+":")
+                code.append("\t\t\tl += i.length()")
+        code.append("\t\treturn l")
+        return code
 
     def codeunpack(self, struct_in, prefix="!"):
         """Return code that unpack struct
