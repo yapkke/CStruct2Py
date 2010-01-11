@@ -149,7 +149,7 @@ class pythonizer:
         code.append("\t\"\"\"Automatically generated Python class for "+struct_in.typename)
         code.append("")
         code.append("\tDate "+str(datetime.date.today()))
-        code.append("\tCreated by CStruct2Py's cypythonize.pythonizer")
+        code.append("\tCreated by "+self.__module__+"."+self.__class__.__name__)
         code.append("\t\"\"\"")
         return code
 
