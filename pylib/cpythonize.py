@@ -165,6 +165,9 @@ class pythonizer:
         """
         code = []
         code.append("\tdef __init__(self):")
+        code.append("\t\t\"\"\"Initialize")
+        code.append("\t\tDeclare members and default values")
+        code.append("\t\t\"\"\"")
         code.extend(self.codemembers(struct_in,"\t\tself"))
         return code
 
@@ -232,6 +235,8 @@ class pythonizer:
         """
         code = []
         code.append("\tdef __assert(self):")
+        code.append("\t\t\"\"\"Sanity check")
+        code.append("\t\t\"\"\"")
         enforce = self.rules.get_enforced_map(struct_in.typename)
         if (enforce != None):
             for line in enforce:
@@ -245,6 +250,9 @@ class pythonizer:
         """
         code = []
         code.append("\tdef pack(self, assertstruct=True):")
+        code.append("\t\t\"\"\"Pack message")
+        code.append("\t\tPacks empty array used as placeholder")
+        code.append("\t\t\"\"\"")
         code.append("\t\tif(assertstruct):")
         code.extend(self.__addassert("\t\t\t"))
         code.append("\t\tpacked = \"\"")
@@ -270,18 +278,28 @@ class pythonizer:
                       isinstance(member.object, cheader.cprimitive)):
                     #Array of Primitives
                     expandedarr = ""
-                    for x in range(0, member.size):
-                        expandedarr += ", self."+member.name+"["+\
-                                       str(x).strip()+"]"
-                    code.append("\t\tpacked += struct.pack(\""+prefix+\
-                                self.__c2py.structmap[member.object.typename]*member.size+\
-                                "\""+expandedarr+")")
+                    if (member.size != 0):
+                        for x in range(0, member.size):
+                            expandedarr += ", self."+member.name+"["+\
+                                           str(x).strip()+"]"
+                        code.append("\t\tpacked += struct.pack(\""+prefix+\
+                                    self.__c2py.structmap[member.object.typename]*member.size+\
+                                    "\""+expandedarr+")")
+                    else:
+                        code.append("\t\tfor i in self."+member.name+":")
+                        code.append("\t\t\tpacked += struct.pack(\""+\
+                                    prefix+self.__c2py.get_pattern(member.object)+\
+                                    "\",i)")
                 elif (isinstance(member, cheader.carray) and \
                       isinstance(member.object, cheader.cstruct)):
                     #Array of struct
-                    for x in range(0, member.size):
-                        code.append("\t\tpacked += self."+member.name+"["+\
-                                    str(x).strip()+"].pack()")
+                    if (member.size != 0):
+                        for x in range(0, member.size):
+                            code.append("\t\tpacked += self."+member.name+"["+\
+                                        str(x).strip()+"].pack()")
+                    else:
+                        code.append("\t\tfor i in self."+member.name+":")
+                        code.append("\t\t\tpacked += i.pack(assertstruct)")
         #Clear remaining fields
         (primPattern, primMemberNames) = \
                       self.__codepackprimitive(code, primPattern,
@@ -305,11 +323,18 @@ class pythonizer:
         pattern = self.__c2py.get_pattern(struct_in)
         code = []
         code.append("\tdef length(self):")
+        code.append("\t\t\"\"\"Return lenght of message")
+        code.append("\t\t\"\"\"")
         code.append("\t\tl = "+str(self.__c2py.get_size(pattern)))
         for member in struct_in.members:
             if (isinstance(member, cheader.carray) and member.size == 0):
-                code.append("\t\tfor i in "+member.name+":")
-                code.append("\t\t\tl += i.length()")
+                if (isinstance(member.object, cheader.cstruct)):
+                    code.append("\t\tfor i in self."+member.name+":")
+                    code.append("\t\t\tl += i.length()")
+                else:
+                    pattern=self.__c2py.get_pattern(member.object)
+                    size=self.__c2py.get_size(pattern)
+                    code.append("\t\tl += len(self."+member.name+")*"+str(size))
         code.append("\t\treturn l")
         return code
 
@@ -320,6 +345,10 @@ class pythonizer:
         structlen = self.__c2py.get_size(pattern)
         code = []
         code.append("\tdef unpack(self, binaryString):")
+        code.append("\t\t\"\"\"Unpack message")
+        code.append("\t\tDo not unpack empty array used as placeholder")
+        code.append("\t\tsince they can contain heterogeneous type")
+        code.append("\t\t\"\"\"")
         code.append("\t\tif (len(binaryString) < "+str(structlen)+"):")
         code.append("\t\t\treturn binaryString")
         offset = 0
@@ -350,14 +379,15 @@ class pythonizer:
                       isinstance(member.object, cheader.cprimitive)):
                     #Array of Primitives
                     expandedarr = ""
-                    arrpattern = self.__c2py.structmap[member.object.typename]*member.size
-                    for x in range(0, member.size):
-                        expandedarr += "self."+member.name+"["+\
-                                       str(x).strip()+"], "
-                    code.append("\t\t("+expandedarr[:-2]+") = struct.unpack_from(\""+\
-                                prefix+arrpattern+\
-                                "\", binaryString, "+str(offset)+")")
-                    offset += struct.calcsize(arrpattern)
+                    if (member.size != 0):
+                        arrpattern = self.__c2py.structmap[member.object.typename]*member.size
+                        for x in range(0, member.size):
+                            expandedarr += "self."+member.name+"["+\
+                                           str(x).strip()+"], "
+                        code.append("\t\t("+expandedarr[:-2]+") = struct.unpack_from(\""+\
+                                    prefix+arrpattern+\
+                                    "\", binaryString, "+str(offset)+")")
+                        offset += struct.calcsize(arrpattern)
                 elif (isinstance(member, cheader.carray) and \
                       isinstance(member.object, cheader.cstruct)):
                     #Array of struct
