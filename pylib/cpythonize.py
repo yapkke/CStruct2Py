@@ -323,7 +323,7 @@ class pythonizer:
         pattern = self.__c2py.get_pattern(struct_in)
         code = []
         code.append("\tdef length(self):")
-        code.append("\t\t\"\"\"Return lenght of message")
+        code.append("\t\t\"\"\"Return length of message")
         code.append("\t\t\"\"\"")
         code.append("\t\tl = "+str(self.__c2py.get_size(pattern)))
         for member in struct_in.members:
